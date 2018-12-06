@@ -32,9 +32,6 @@ void initBoard(void)
   CMU_ClockEnable(cmuClock_GPIO, true);
   // Place custom board initialization code here.
 
-  GPIO_DriveStrengthSet(LED0_port, gpioDriveStrengthStrongAlternateStrong);
-  GPIO_PinModeSet(LED0_port, LED0_pin, gpioModePushPull, LED0_default);
-  GPIO_PinOutSet(LED0_port, LED0_pin);
-
+    init_leds();
 }
 

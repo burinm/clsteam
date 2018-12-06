@@ -38,6 +38,8 @@
 #include "bspconfig.h"
 #endif
 
+#include "leds.h"
+
 /***********************************************************************************************//**
  * @addtogroup Application
  * @{
@@ -86,8 +88,12 @@ void main(void)
   // Initialize application
   initApp();
 
+  led_on(LED1);
+
   // Initialize stack
   gecko_init(&config);
+
+  led_on(LED0);
 
   while (1) {
     /* Event pointer for handling events */
