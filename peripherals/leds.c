@@ -3,16 +3,13 @@
 
 void init_leds() {
     GPIO_DriveStrengthSet(LED_port, gpioDriveStrengthStrongAlternateStrong);
-    GPIO_PinModeSet(LED_port, LED2_pin, gpioModePushPull, LED2_default);
-    GPIO_PinOutSet(LED_port, LED2_pin);
+    GPIO_PinModeSet(LED_port, LED2_pin, gpioModePushPull, LED_default);
 
     GPIO_DriveStrengthSet(LED_port, gpioDriveStrengthStrongAlternateStrong);
-    GPIO_PinModeSet(LED_port, LED1_pin, gpioModePushPull, LED1_default);
-    GPIO_PinOutSet(LED_port, LED1_pin);
+    GPIO_PinModeSet(LED_port, LED1_pin, gpioModePushPull, LED_default);
 
     GPIO_DriveStrengthSet(LED_port, gpioDriveStrengthStrongAlternateStrong);
-    GPIO_PinModeSet(LED_port, LED0_pin, gpioModePushPull, LED0_default);
-    GPIO_PinOutSet(LED_port, LED0_pin);
+    GPIO_PinModeSet(LED_port, LED0_pin, gpioModePushPull, LED_default);
 }
 
 //turn on led
