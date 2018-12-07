@@ -24,5 +24,6 @@
 #define ACCELEROMETER_INT2   PB11 //             - P18
 
 void I2C0_init();
+void performI2CTransfer(void);
 
 #endif

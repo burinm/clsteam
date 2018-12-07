@@ -95,6 +95,15 @@ void main(void)
 
   led_on(LED0);
 
+  //Test I2C write
+#if 0
+  while (1) {
+      performI2CTransfer();
+  }
+#endif
+
+
+
   while (1) {
     /* Event pointer for handling events */
     struct gecko_cmd_packet* evt;

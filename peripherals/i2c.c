@@ -3,6 +3,8 @@
 #include <em_gpio.h>
 #include <em_cmu.h>
 
+#include <stdlib.h> //NULL
+
 
 void I2C0_init() {
 /* Parts copied verbatim from i2c_master_slave.c (an/an0011_efm32_i2c)
@@ -62,4 +64,45 @@ void I2C0_init() {
 #endif
   //I2C0->CTRL |= I2C_CTRL_EN; 
 
+}
+
+void performI2CTransfer(void)
+{
+/* Taken verbatim from https://github.com/SiliconLabs/peripheral_examples/blob/public/i2c/i2c/src/main_efr.c
+
+    Copyright 2018 Silicon Labs, Inc. http://www.silabs.com
+*/
+
+  // Transfer structure
+  I2C_TransferSeq_TypeDef i2cTransfer;
+  I2C_TransferReturn_TypeDef result;
+
+  // Setting LED to indicate transfer
+  //GPIO_PinOutSet(BSP_GPIO_LED1_PORT, BSP_GPIO_LED1_PIN);
+
+
+/* testing */
+uint8_t i2c_txBuffer[] = "Hello I2C";
+uint8_t i2c_txBufferSize = sizeof(i2c_txBuffer);
+uint8_t i2c_rxBuffer = NULL;
+#define I2C_RXBUFFER_SIZE 0;
+
+  // Initializing I2C transfer
+  i2cTransfer.addr          = I2C0_ADDR;
+  i2cTransfer.flags         = I2C_FLAG_WRITE;
+  i2cTransfer.buf[0].data   = i2c_txBuffer;
+  i2cTransfer.buf[0].len    = i2c_txBufferSize;
+  i2cTransfer.buf[1].data   = i2c_rxBuffer;
+  i2cTransfer.buf[1].len    = I2C_RXBUFFER_SIZE;
+  result = I2C_TransferInit(I2C0, &i2cTransfer);
+
+  // Sending data
+  while (result == i2cTransferInProgress)
+  {
+    result = I2C_Transfer(I2C0);
+  }
+
+  // Clearing pin to indicate end of transfer
+  //GPIO_PinOutClear(BSP_GPIO_LED1_PORT, BSP_GPIO_LED1_PIN);
+  //enableI2cSlaveInterrupts();
 }
