@@ -425,7 +425,7 @@ static SLEEP_EnergyMode_t enterEMx(SLEEP_EnergyMode_t eMode)
     return sleepEM0;
   }
 
-#if 0
+#if 1
   /* Enter the requested energy mode. */
   switch (eMode) {
     case sleepEM1:

@@ -147,7 +147,8 @@ Mode 2CYCLES 16CYCLES 32CYCLES
   // Enable LFRCO oscillator, and wait for it to be stable
   CMU_OscillatorEnable(cmuOsc_LFRCO, true, true);
 
-//??  CMU_ClockEnable(cmuClock_LFE, true); //TODO burin - added, didn't test
+///ODO burin - do we need this? 
+  //CMU_ClockEnable(cmuClock_LFE, true);
 
   CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFRCO);
   CMU_ClockSelectSet(cmuClock_LFB, cmuSelect_LFRCO);

@@ -41,6 +41,8 @@
 #include "leds.h"
 #include "accelerometer.h"
 
+#include "sleep.h" //TODO remove me
+
 /***********************************************************************************************//**
  * @addtogroup Application
  * @{
@@ -94,6 +96,10 @@ void main(void)
   // Initialize stack
   gecko_init(&config);
 
+ //Can't connect to BLE without disabling these
+ SLEEP_SleepBlockBegin(sleepEM3); // EM3 and EM4 are blocked
+ SLEEP_SleepBlockBegin(sleepEM2); // EM2, EM3 and EM4 are blocked
+
 
   //Test I2C write
 #if 0
@@ -108,8 +114,6 @@ void main(void)
     }
 
     led_on(LED2);
-
-
 
 
   while (1) {
