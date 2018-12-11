@@ -21,6 +21,7 @@
 #include "board_features.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
+#include "em_usart.h"
 #include "leds.h"
 #include "accelerometer.h"
 
@@ -36,6 +37,16 @@ void initBoard(void)
   CMU_ClockEnable(cmuClock_I2C0, true);
 
   init_leds();
+
+#if 0
+  UART0_init();
+  USART_Enable(USART0,usartEnable);
+#endif
+
+#if 1
+  UART1_init();
+  USART_Enable(USART1,usartEnable);
+#endif
 
   //Setup power port for accelerator PB13
   GPIO_DriveStrengthSet(ADXL345_POWER_PORT, gpioDriveStrengthStrongAlternateStrong);

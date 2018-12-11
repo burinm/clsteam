@@ -100,6 +100,21 @@ void main(void)
  SLEEP_SleepBlockBegin(sleepEM3); // EM3 and EM4 are blocked
  SLEEP_SleepBlockBegin(sleepEM2); // EM2, EM3 and EM4 are blocked
 
+ uart_print_string(USART1,"CLS ready.\n\r");
+
+#if 0
+ //Test UART0
+ while(1) {
+
+     char hello_world[] = "Hello world.";
+     for (int i=0; i< strlen(hello_world); i++) {
+         USART_Tx(USART1,hello_world[i]);
+     }
+
+     //USART_Tx(USART0,USART_Rx(USART0));
+ }
+#endif
+
 
   //Test I2C write
 #if 0

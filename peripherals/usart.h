@@ -14,11 +14,12 @@ void UART0_init();
 
 //FSK interface
 #define UART1_BAUD  9600
-#define UART1_US1_TX_LOCATION    11 //PC6 - EXP header #4
-#define UART1_US1_RX_LOCATION    11 //PC7 - EXP header #6
-#define UART1_US1_CS_LOCATION    11 //PC9 - EXP header #10
-#define UART1_US1_CLK_LOCATION    11 //PC8 - EXP header #8
+#define UART1_US1_TX_LOCATION    13 //PC8 US1_TX
+#define UART1_US1_RX_LOCATION    14 //PC10 US1_RX 
+//#define UART1_US1_CS_LOCATION    11 //PC9 - EXP header #10
+//#define UART1_US1_CLK_LOCATION    11 //PC8 - EXP header #8
 
 void UART1_init();
 
+void uart_print_string(USART_TypeDef *u, uint8_t * s);
 #endif

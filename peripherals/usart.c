@@ -42,8 +42,10 @@ void UART0_init() {
 }
 
 /* Not working as SPI, this is a asynchronous setup at the moment */
+
+/* Right now using RFRX interface for debugging */
 void UART1_init() {
-#if 0
+#if 1
     /* USART is a HFPERCLK peripheral. Enable HFPERCLK domain and USART1.
      * We also need to enable the clock for GPIO to configure pins. */
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -88,4 +90,14 @@ void UART1_init() {
     //}
 
 #endif
+}
+
+void uart_print_string(USART_TypeDef *u, uint8_t * s) {
+
+int i=0;
+    while (s && *(uint8_t *)(s + i) && (i < 255)) {
+         USART_Tx(u, *(uint8_t *)(s + i));
+         i++;
+     }
+
 }
