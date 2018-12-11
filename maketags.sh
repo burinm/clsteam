@@ -13,5 +13,5 @@ find ${PLATFORM} -iname "*.h" -or -iname "*.c" -or -iname "*.cpp" -or -iname "*.
 find ${BLE_LIB} -iname "*.h" -or -iname "*.c" -or -iname "*.cpp" -or -iname "*.s" -or -name Makefile >> cscope.files
 
 cscope -b
-/home/burin/ctags-u/bin/ctags -L ./cscope.files
+ctags -L ./cscope.files
 cscope

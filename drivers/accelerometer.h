@@ -1,6 +1,8 @@
 #ifndef __ACCELEROMETER_H__
 #define __ACCELEROMETER_H__
 
+#include <stdint.h>
+
 #define ADXL345_I2C_ADDR            0x1D // SDO/ALT ADDRESS pin high
 #define ADXL345_I2C_ADDR_ALT        0x53 //   "                 low 
 
@@ -151,5 +153,11 @@
 #define ADXL345_DATA_RATE_25_HZ     0x8
 #define ADXL345_DATA_RATE_12_5_HZ   0x7
 #define ADXL345_DATA_RATE_6_25_HZ   0x6
+
+uint8_t adxl345_get_device_id(uint16_t * id);
+
+#define ADXL345_POWER_PORT  gpioPortB
+#define ADXL345_POWER_PIN   13
+void adxl345_power_on();
 
 #endif

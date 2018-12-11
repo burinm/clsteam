@@ -23,7 +23,19 @@
 #define ACCELEROMETER_INT1   PB12 //             - P20
 #define ACCELEROMETER_INT2   PB11 //             - P18
 
+#define I2C_RX_BUFF_SZ  256
+extern uint8_t i2c_RX_buff[I2C_RX_BUFF_SZ];
+extern uint16_t i2c_RX_count;
+
+#define I2C_CMD_ARRAY_SZ    1
+extern uint8_t i2c_cmd_array[I2C_CMD_ARRAY_SZ];
+#define I2C_DATA_ARRAY_SZ    10
+extern uint8_t i2c_data_array[I2C_DATA_ARRAY_SZ];
+
 void I2C0_init();
 void performI2CTransfer(void);
+void i2c_transfer(uint16_t device_addr, uint8_t cmd_array[], uint8_t data_array[], uint16_t cmd_len, uint16_t data_len, uint8_t flag);
+uint8_t i2c_read_register(uint8_t reg_offset);
+void i2cRead();
 
 #endif

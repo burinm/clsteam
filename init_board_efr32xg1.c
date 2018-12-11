@@ -22,6 +22,8 @@
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "leds.h"
+#include "accelerometer.h"
+
 
 #warning "WARNING: Custom boards contain no init code in initBoard. Please make sure you have created the init code needed for your board."
 void initBoard(void)
@@ -31,7 +33,15 @@ void initBoard(void)
   // Enable GPIO clock source
   CMU_ClockEnable(cmuClock_GPIO, true);
   // Place custom board initialization code here.
+  CMU_ClockEnable(cmuClock_I2C0, true);
 
-    init_leds();
+  init_leds();
+
+  //Setup power port for accelerator PB13
+  GPIO_DriveStrengthSet(ADXL345_POWER_PORT, gpioDriveStrengthStrongAlternateStrong);
+  GPIO_PinModeSet(ADXL345_POWER_PORT, ADXL345_POWER_PIN, gpioModePushPull, false);
+  adxl345_power_on();
+
+  I2C0_init();
 }
 

@@ -39,6 +39,7 @@
 #endif
 
 #include "leds.h"
+#include "accelerometer.h"
 
 /***********************************************************************************************//**
  * @addtogroup Application
@@ -88,12 +89,11 @@ void main(void)
   // Initialize application
   initApp();
 
-  led_on(LED1);
+  led_on(LED0);
 
   // Initialize stack
   gecko_init(&config);
 
-  led_on(LED0);
 
   //Test I2C write
 #if 0
@@ -101,6 +101,14 @@ void main(void)
       performI2CTransfer();
   }
 #endif
+    uint16_t adxl345_id=0;
+    if (! adxl345_get_device_id(&adxl345_id)) {
+        led_on(LED1);
+        for(;;);
+    }
+
+    led_on(LED2);
+
 
 
 
