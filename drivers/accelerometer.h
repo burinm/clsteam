@@ -159,5 +159,26 @@ uint8_t adxl345_get_device_id(uint16_t * id);
 #define ADXL345_POWER_PORT  gpioPortB
 #define ADXL345_POWER_PIN   13
 void adxl345_power_on();
+void adxl345_setup();
+
+#define ADXL345_INT1_PORT   gpioPortB //TP 18
+#define ADXL345_INT1_PIN    12
+
+#define ADXL345_INT2_PORT   gpioPortB //TP 19
+#define ADXL345_INT2_PIN    11
+
+typedef struct {
+    int16_t x;
+    int16_t y;
+    int16_t z;
+} xyz_data;
+
+void adxl345_read_xyz(xyz_data *);
+
+extern uint8_t accel_int1;
+extern uint8_t accel_int2;
+
+
+
 
 #endif

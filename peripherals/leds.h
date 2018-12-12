@@ -14,6 +14,9 @@
 #define LED0            LED0_pin
 
 void init_leds();
+void led_on(unsigned int pin);
+void led_off(unsigned int pin);
+void led_toggle(unsigned int pin);
 
 
 

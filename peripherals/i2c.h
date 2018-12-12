@@ -19,9 +19,11 @@
 #define I2C0_SCL_PORT        gpioPortA
 #define I2C0_SCL_PIN         4 
 
+#if 0
 #define ACCELEROMETER_CS     PB13 //             - P22
 #define ACCELEROMETER_INT1   PB12 //             - P20
 #define ACCELEROMETER_INT2   PB11 //             - P18
+#endif
 
 #define I2C_RX_BUFF_SZ  256
 extern uint8_t i2c_RX_buff[I2C_RX_BUFF_SZ];
@@ -36,6 +38,8 @@ void I2C0_init();
 void performI2CTransfer(void);
 void i2c_transfer(uint16_t device_addr, uint8_t cmd_array[], uint8_t data_array[], uint16_t cmd_len, uint16_t data_len, uint8_t flag);
 uint8_t i2c_read_register(uint8_t reg_offset);
+uint8_t i2c_read_bytes(uint8_t reg_offset, uint8_t n);
+void i2c_write_register_1_byte(uint8_t reg_offset, uint8_t write_data);
 void i2cRead();
 
 #endif

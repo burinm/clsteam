@@ -28,6 +28,7 @@
 /* Libraries containing default Gecko configuration values */
 #include "em_emu.h"
 #include "em_cmu.h"
+#include "em_core.h"
 
 /* Device initialization header */
 #include "hal-config.h"
@@ -91,7 +92,7 @@ void main(void)
   // Initialize application
   initApp();
 
-  led_on(LED0);
+  //led_on(LED0);
 
   // Initialize stack
   gecko_init(&config);
@@ -128,7 +129,24 @@ void main(void)
         for(;;);
     }
 
-    led_on(LED2);
+    //led_on(LED2);
+
+adxl345_setup();
+xyz_data acc_d;
+
+char string_buff1[35];
+while(1) {
+
+    if (accel_int1 == 1) {
+        adxl345_read_xyz(&acc_d);
+
+        snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
+        uart_print_string(USART1,string_buff1);
+        CORE_ATOMIC_IRQ_DISABLE();
+            accel_int1 = 0;
+        CORE_ATOMIC_IRQ_ENABLE();
+    }
+}
 
 
   while (1) {

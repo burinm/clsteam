@@ -1,3 +1,18 @@
+/* The majority of this code copied and modified from 
+
+https://github.com/SiliconLabs/makersguide
+
+ Copyright Silicon Labs, http://www.silabs.com
+ *******************************************************************************
+ *
+ * This file is licensed under the Silicon Labs Software License Agreement. See 
+ * "http://developer.silabs.com/legal/version/v11/Silicon_Labs_Software_License_Agreement.txt"  
+ * for details. Before using this software for any purpose, you must agree to the 
+ * terms of that agreement.
+ *
+*/
+
+
 #include "i2c.h"
 #include <em_i2c.h>
 #include <em_gpio.h>
@@ -59,7 +74,7 @@ void I2C0_init() {
   /* Initializing the I2C */
 
  // Using default settings
-  I2C_Init_TypeDef i2cInit = I2C_INIT_DEFAULT;
+  I2C_Init_TypeDef i2cInit = I2C_INIT_DEFAULT; //Standard max 100Hz
   I2C_Init(I2C0, &i2cInit);
 
 #if 0
@@ -160,6 +175,23 @@ uint8_t i2c_read_register(uint8_t reg_offset) {
       i2c_cmd_array[0] = reg_offset;
       i2c_transfer(ADXL345_I2C_ADDR_ALT, i2c_cmd_array, i2c_data_array, 1, 1, I2C_FLAG_WRITE_READ);
       return i2c_data_array[0];
+}
+
+uint8_t i2c_read_bytes(uint8_t reg_offset, uint8_t n) {
+if (n > I2C_DATA_ARRAY_SZ) {
+    n = I2C_DATA_ARRAY_SZ;
+}
+
+      i2c_cmd_array[0] = reg_offset;
+      i2c_transfer(ADXL345_I2C_ADDR_ALT, i2c_cmd_array, i2c_data_array, 1, n, I2C_FLAG_WRITE_READ);
+      return i2c_data_array[0];
+}
+
+/* https://github.com/SiliconLabs/makersguide/blob/master/10_i2c_accelerometer/src/main_interrupt_on_event_energy_profiler.c */
+void i2c_write_register_1_byte(uint8_t reg_offset, uint8_t write_data) {
+	i2c_cmd_array[0] = reg_offset;
+	i2c_data_array[0] = write_data;
+	i2c_transfer(ADXL345_I2C_ADDR_ALT, i2c_cmd_array, i2c_data_array, 1, 1, I2C_FLAG_WRITE_WRITE);
 }
 
 void i2c_read() {
