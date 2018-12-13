@@ -1,2 +1,6 @@
-GNU\ ARM\ v7.2.1\ -\ Debug/*
+GNU\ ARM\ v7.2.1\ -\ Debug/
 imported_project_report.html
+.settings/
+cscope.files
+cscope.out
+tags

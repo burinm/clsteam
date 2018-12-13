@@ -57,6 +57,7 @@
     #define ADXL345_REG_BW_RATE_D5_0                (1<<5)
     #define ADXL345_REG_BW_RATE_LOW_PWR             (1<<4) // 0 = normal, 1 = reduced power
         #define ADXL345_REG_BW_RATE_RATE_MASK               0xF //Default = 0xA, 100Hz 
+    #define ADXL345_REG_BW_DEFAULT         0xA 
 
 #define ADXL345_REG_POWER_CTL       0x2D
     #define ADXL345_REG_POWER_CTL_D7_0              (1<<7) 
@@ -177,8 +178,8 @@ void adxl345_read_xyz(xyz_data *);
 uint8_t adxl345_fifo_depth();
 uint8_t adxl345_fifo_full();
 
-extern uint8_t accel_int1;
-extern uint8_t accel_int2;
+extern volatile uint8_t accel_int1;
+extern volatile uint8_t accel_int2;
 
 
 

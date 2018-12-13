@@ -1,17 +1,21 @@
 #include "interrupt.h"
 #include "accelerometer.h"
 #include "em_gpio.h"
+#include "em_core.h"
 #include "leds.h"
 
 void GPIO_EVEN_IRQHandler(void) {
+CORE_ATOMIC_IRQ_DISABLE();
     accel_int1=1;
     led_on(LED1);
-    GPIO_IntClear(0x5555);
+    GPIO->IFC = (GPIO->IF & 0x5555);
+CORE_ATOMIC_IRQ_ENABLE();
 }
 
-void GPIO_odd_IRQHandler(void) {
+void GPIO_ODD_IRQHandler(void) {
+CORE_ATOMIC_IRQ_DISABLE();
     accel_int2=1;
     led_on(LED2);
-    GPIO_IntClear(0xAAAA);
-
+    GPIO->IFC = (GPIO->IF & 0xAAAA);
+CORE_ATOMIC_IRQ_ENABLE();
 }

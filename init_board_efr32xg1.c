@@ -67,7 +67,14 @@ if (! adxl345_get_device_id(&adxl345_id)) {
 }
 #endif
 
-//adxl345_setup();
+/*
+    On a warm boot, the capicitors keep the memory alive,
+    Reset to defaults from data sheet
+*/
+adxl345_defaults();
+
+//Setup accelerometer interrupts
+adxl345_setup();
 
 }
 

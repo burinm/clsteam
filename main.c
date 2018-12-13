@@ -92,7 +92,7 @@ void main(void)
   // Initialize application
   initApp();
 
-  //led_on(LED0);
+  led_on(LED0);
 
   // Initialize stack
   gecko_init(&config);
@@ -116,14 +116,14 @@ void main(void)
  }
 #endif
 
-#if 0
+#if 0 //Testing accelerometer data ready interrupt
 xyz_data acc_d;
 
 char string_buff1[35];
 
 while(1) {
 int8_t d;
-    if (accel_int2 == 1) {
+    if (accel_int1 == 1) {
         i2c_read_register(ADXL345_REG_INT_SOURCE);
         d = adxl345_fifo_depth();
         while (d > 0) {
@@ -134,8 +134,25 @@ int8_t d;
             uart_print_string(USART1,string_buff1);
         }
         CORE_ATOMIC_IRQ_DISABLE();
-        accel_int2 = 0;
+        accel_int1 = 0;
         CORE_ATOMIC_IRQ_ENABLE();
+    }
+}
+#endif
+
+#if 0 //testing general GPIO interrupts
+while(1) {
+    if (accel_int1 == 1) {
+            uart_print_string(USART1,"int1\n\r");
+            CORE_ATOMIC_IRQ_DISABLE();
+            accel_int1 = 0;
+            CORE_ATOMIC_IRQ_ENABLE();
+    }
+    if (accel_int2 == 1) {
+            uart_print_string(USART1,"int2\n\r");
+            CORE_ATOMIC_IRQ_DISABLE();
+            accel_int2 = 0;
+            CORE_ATOMIC_IRQ_ENABLE();
     }
 }
 #endif

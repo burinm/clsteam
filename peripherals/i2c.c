@@ -194,6 +194,14 @@ void i2c_write_register_1_byte(uint8_t reg_offset, uint8_t write_data) {
 	i2c_transfer(ADXL345_I2C_ADDR_ALT, i2c_cmd_array, i2c_data_array, 1, 1, I2C_FLAG_WRITE_WRITE);
 }
 
+#if 0 //not tested
+void i2c_write_register_bytes(uint8_t reg_offset, uint8_t write_data, uint8_t n) {
+	i2c_cmd_array[0] = reg_offset;
+	i2c_data_array[0] = write_data;
+	i2c_transfer(ADXL345_I2C_ADDR_ALT, i2c_cmd_array, i2c_data_array, 1, 2, I2C_FLAG_WRITE_WRITE);
+}
+#endif
+
 void i2c_read() {
 
     while (1) {
