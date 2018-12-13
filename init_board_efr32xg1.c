@@ -29,6 +29,9 @@
 #warning "WARNING: Custom boards contain no init code in initBoard. Please make sure you have created the init code needed for your board."
 void initBoard(void)
 {
+  //Reset accelerometer
+  //adxl345_power_off();
+
   // Enable clock for USART0
   CMU_ClockEnable(cmuClock_USART0, true);
   // Enable GPIO clock source
@@ -48,11 +51,23 @@ void initBoard(void)
   USART_Enable(USART1,usartEnable);
 #endif
 
-  //Setup power port for accelerator PB13
+  //Setup power port for acceleromter PB13
   GPIO_DriveStrengthSet(ADXL345_POWER_PORT, gpioDriveStrengthStrongAlternateStrong);
   GPIO_PinModeSet(ADXL345_POWER_PORT, ADXL345_POWER_PIN, gpioModePushPull, false);
+
   adxl345_power_on();
 
   I2C0_init();
+
+#if 1 //Can we talk to accelerometer?
+uint16_t adxl345_id=0;
+if (! adxl345_get_device_id(&adxl345_id)) {
+    led_on(LED1);
+    for(;;);
+}
+#endif
+
+//adxl345_setup();
+
 }
 

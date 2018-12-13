@@ -116,37 +116,29 @@ void main(void)
  }
 #endif
 
-
-  //Test I2C write
 #if 0
-  while (1) {
-      performI2CTransfer();
-  }
-#endif
-    uint16_t adxl345_id=0;
-    if (! adxl345_get_device_id(&adxl345_id)) {
-        led_on(LED1);
-        for(;;);
-    }
-
-    //led_on(LED2);
-
-adxl345_setup();
 xyz_data acc_d;
 
 char string_buff1[35];
+
 while(1) {
+int8_t d;
+    if (accel_int2 == 1) {
+        i2c_read_register(ADXL345_REG_INT_SOURCE);
+        d = adxl345_fifo_depth();
+        while (d > 0) {
+            d-=6;
+            adxl345_read_xyz(&acc_d);
 
-    if (accel_int1 == 1) {
-        adxl345_read_xyz(&acc_d);
-
-        snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
-        uart_print_string(USART1,string_buff1);
+            snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
+            uart_print_string(USART1,string_buff1);
+        }
         CORE_ATOMIC_IRQ_DISABLE();
-            accel_int1 = 0;
+        accel_int2 = 0;
         CORE_ATOMIC_IRQ_ENABLE();
     }
 }
+#endif
 
 
   while (1) {

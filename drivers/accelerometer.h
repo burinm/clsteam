@@ -174,6 +174,8 @@ typedef struct {
 } xyz_data;
 
 void adxl345_read_xyz(xyz_data *);
+uint8_t adxl345_fifo_depth();
+uint8_t adxl345_fifo_full();
 
 extern uint8_t accel_int1;
 extern uint8_t accel_int2;
