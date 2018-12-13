@@ -57,29 +57,6 @@ void adxl345_defaults() {
 
 void adxl345_setup() {
 
-#if 0
-i2c_write_register_1_byte(ADXL345_REG_DATA_FORMAT, ADXL345_REG_DATA_FORMAT_FULL_RES);
-//default 100Hz - i2c_write_register_1_byte(ADXL345_REG_BW_RATE
-i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & ADXL345_DATA_RATE_50_HZ);
-
-//Clear interrupts
-i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, 0);
-
-//Interrupt on data ready
-i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, ADXL345_REG_INT_ENABLE_DATA_READY);
-
-//Data ready interrupt on INT2
-//i2c_write_register_1_byte(ADXL345_REG_INT_MAP,ADXL345_REG_INT_MAP_DATA_READY);
-
-//Clear interrupts with read
-(void) i2c_read_register(ADXL345_REG_INT_SOURCE);
-
-//Start data
-i2c_write_register_1_byte(ADXL345_REG_POWER_CTL, ADXL345_REG_POWER_CTL_MEASURE);
-
-#endif
-    
-
 #if 1
     //Setup interrupts for accelerometer
         //even
@@ -102,6 +79,30 @@ i2c_write_register_1_byte(ADXL345_REG_POWER_CTL, ADXL345_REG_POWER_CTL_MEASURE);
     NVIC_EnableIRQ(GPIO_EVEN_IRQn);
     NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
     NVIC_EnableIRQ(GPIO_ODD_IRQn);
+
+#if 1
+i2c_write_register_1_byte(ADXL345_REG_DATA_FORMAT, ADXL345_REG_DATA_FORMAT_FULL_RES);
+//default 100Hz - i2c_write_register_1_byte(ADXL345_REG_BW_RATE
+i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & ADXL345_DATA_RATE_50_HZ);
+
+//Clear interrupts
+i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, 0);
+
+//Interrupt on data ready
+i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, ADXL345_REG_INT_ENABLE_DATA_READY);
+
+//Data ready interrupt on INT2
+//i2c_write_register_1_byte(ADXL345_REG_INT_MAP,ADXL345_REG_INT_MAP_DATA_READY);
+
+//Clear interrupts with read
+(void) i2c_read_register(ADXL345_REG_INT_SOURCE);
+
+//Start data
+i2c_write_register_1_byte(ADXL345_REG_POWER_CTL, ADXL345_REG_POWER_CTL_MEASURE);
+
+#endif
+    
+
 
 }
 

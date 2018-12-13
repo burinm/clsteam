@@ -124,12 +124,9 @@ char string_buff1[35];
 while(1) {
 int8_t d;
     if (accel_int1 == 1) {
-        i2c_read_register(ADXL345_REG_INT_SOURCE);
-        d = adxl345_fifo_depth();
-        while (d > 0) {
-            d-=6;
+        //Keep reading until empty, then the accelerator interrupt is cleared
+        while(i2c_read_register(ADXL345_REG_INT_SOURCE) & ADXL345_REG_INT_SOURCE_DATA_READY) {
             adxl345_read_xyz(&acc_d);
-
             snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
             uart_print_string(USART1,string_buff1);
         }
