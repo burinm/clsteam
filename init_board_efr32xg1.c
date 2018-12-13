@@ -24,6 +24,7 @@
 #include "em_usart.h"
 #include "leds.h"
 #include "accelerometer.h"
+#include "gps.h"
 
 
 #warning "WARNING: Custom boards contain no init code in initBoard. Please make sure you have created the init code needed for your board."
@@ -39,9 +40,19 @@ void initBoard(void)
   // Place custom board initialization code here.
   CMU_ClockEnable(cmuClock_I2C0, true);
 
+  //Port D will be used to drive LEDS and GPS load switch
+  //*We might have a bug, where our input button on PD13 is connected to this port*
+  GPIO_DriveStrengthSet(gpioPortD, gpioDriveStrengthStrongAlternateStrong);
+
+  //Setup load switch pin for GPS
+  GPIO_PinModeSet(GPS_POWER_PORT, GPS_POWER_PIN, gpioModePushPull, false);
+
   init_leds();
 
-#if 0
+  //Turn on GPS early, big current inrush
+    gps_power_on();
+
+#if 1
   UART0_init();
   USART_Enable(USART0,usartEnable);
 #endif

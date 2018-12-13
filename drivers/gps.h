@@ -125,8 +125,15 @@ Checksum (CS) field is transmitted in all messages. The checksum field is the la
     } skytraq_data_msg_t __attribute__((__packed__,gcc_struct));
 
 
-void open();
-void close();
+//Actually the port connected to the load switch
+#define GPS_POWER_PORT  gpioPortD
+#define GPS_POWER_PIN   15
+
+void gps_power_on();
+void gps_power_off();
+
+//void gps_open();
+//void gps_close();
 
 void init_gps();
 void gps_run_main_seq();

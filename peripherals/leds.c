@@ -2,13 +2,8 @@
 #include <em_gpio.h>
 
 void init_leds() {
-    GPIO_DriveStrengthSet(LED_port, gpioDriveStrengthStrongAlternateStrong);
     GPIO_PinModeSet(LED_port, LED2_pin, gpioModePushPull, LED_default);
-
-    GPIO_DriveStrengthSet(LED_port, gpioDriveStrengthStrongAlternateStrong);
     GPIO_PinModeSet(LED_port, LED1_pin, gpioModePushPull, LED_default);
-
-    GPIO_DriveStrengthSet(LED_port, gpioDriveStrengthStrongAlternateStrong);
     GPIO_PinModeSet(LED_port, LED0_pin, gpioModePushPull, LED_default);
 }
 

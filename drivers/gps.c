@@ -8,6 +8,14 @@ char latitude[11];
 char longitude[11];
 char altitude[11];
 
+void gps_power_on() {
+    GPIO_PinOutSet(GPS_POWER_PORT, GPS_POWER_PIN);
+}
+
+void gps_power_off() {
+    GPIO_PinOutClear(GPS_POWER_PORT, GPS_POWER_PIN);
+}
+
 void init_gps()
 {
   //GPIO_PortOutSet();

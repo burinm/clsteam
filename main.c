@@ -154,6 +154,12 @@ while(1) {
 }
 #endif
 
+#if 0 //Test GPS TX -> UART1
+while(1) {
+    USART_Tx(USART1,USART_Rx(USART0));
+}
+#endif
+
 
   while (1) {
     /* Event pointer for handling events */
