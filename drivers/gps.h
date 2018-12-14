@@ -1,5 +1,7 @@
 #ifndef __GPS_H__
 #define __GPS_H__
+
+#include "nmea.h"
 /*
 Driver for Venus638FLPx GPS Receiver
     burin, 2018/9/26
@@ -124,6 +126,7 @@ Checksum (CS) field is transmitted in all messages. The checksum field is the la
         uint16_t datum_index;
     } skytraq_data_msg_t __attribute__((__packed__,gcc_struct));
 
+extern nmea_gps_coords_t nmea_gps_coords;
 
 //Actually the port connected to the load switch
 #define GPS_POWER_PORT  gpioPortD

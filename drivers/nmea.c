@@ -62,27 +62,33 @@ uint8_t nmea_parse_message() {
 
   if(nmea_str_split(NMEA_TYPE_INDEX))
   {
-    if(nmea_field_comp(GGA))
+    //if(nmea_field_comp(GGA))
+    if(strncmp(GGA, nmea_field, NMEA_MAX_LEN) == 0)
     {
       if(nmea_str_split(LATITUDE))
       {
-        nmea_field_copy(nmea_gps_coords.latitude);
+        strcpy(nmea_gps_coords.latitude, nmea_field);
+        //nmea_field_copy(nmea_gps_coords.latitude);
 
         if(nmea_str_split(LONGITUDE))
         {
-          nmea_field_copy(nmea_gps_coords.longitude);
+          strcpy(nmea_gps_coords.longitude, nmea_field); 
+          //nmea_field_copy(nmea_gps_coords.longitude);
 
           if(nmea_str_split(ALTITUDE))
           {
-            nmea_field_copy(nmea_gps_coords.altitude);
+            strcpy(nmea_gps_coords.altitude, nmea_field);
+            //nmea_field_copy(nmea_gps_coords.altitude);
 
             if(nmea_str_split(NS_INDICATOR))
             {
-              nmea_field_copy(nmea_gps_coords.ns_indicator);
+              strcpy(nmea_gps_coords.ns_indicator, nmea_field);
+              //nmea_field_copy(nmea_gps_coords.ns_indicator);
 
               if(nmea_str_split(EW_INDICATOR))
               {
-                nmea_field_copy(nmea_gps_coords.ew_indicator);
+                strcpy(nmea_gps_coords.ew_indicator, nmea_field);
+                //nmea_field_copy(nmea_gps_coords.ew_indicator);
               }
               else
               {

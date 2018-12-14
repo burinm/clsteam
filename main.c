@@ -41,6 +41,7 @@
 
 #include "leds.h"
 #include "accelerometer.h"
+#include "gps.h"
 
 #include "sleep.h" //TODO remove me
 
@@ -159,6 +160,33 @@ while(1) {
     USART_Tx(USART1,USART_Rx(USART0));
 }
 #endif
+
+#if 0 //Test GPS data parser
+while (1) {
+    gps_run_main_seq();
+
+    uart_print_string(USART1, "latitude:");
+    uart_print_string(USART1, nmea_gps_coords.latitude);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "longitude:");
+    uart_print_string(USART1, nmea_gps_coords.longitude);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "altitude:");
+    uart_print_string(USART1, nmea_gps_coords.altitude);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "ns:");
+    uart_print_string(USART1, nmea_gps_coords.ns_indicator);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "ew:");
+    uart_print_string(USART1, nmea_gps_coords.ew_indicator);
+    uart_print_string(USART1, "\n\r");
+}
+#endif
+
 
 
   while (1) {

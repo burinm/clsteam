@@ -62,7 +62,7 @@ void initBoard(void)
   USART_Enable(USART1,usartEnable);
 #endif
 
-  //Setup power port for acceleromter PB13
+  //Setup power port for acceleromter PB13 - port B
   GPIO_DriveStrengthSet(ADXL345_POWER_PORT, gpioDriveStrengthStrongAlternateStrong);
   GPIO_PinModeSet(ADXL345_POWER_PORT, ADXL345_POWER_PIN, gpioModePushPull, false);
 

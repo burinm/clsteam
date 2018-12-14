@@ -10,7 +10,7 @@
 #define NMEA_TYPE_INDEX 0
 
 //The following field is based on observed field lengths that come from the GPS
-#define NMEA_FIELD_MAX_LEN 11
+#define NMEA_FIELD_MAX_LEN 12
 #define NMEA_FIELD_IND_LEN 2
 
 #define GGA "$GNGGA\0" //Global Positioning System Fix Data
@@ -54,9 +54,9 @@ uint8_t nmea_field_copy(char dest[NMEA_FIELD_MAX_LEN]);
 uint8_t nmea_field_copy_short(char dest[NMEA_FIELD_IND_LEN]);
 
 //MEMBERS
-char nmea_string[NMEA_MAX_LEN];
-char nmea_field[NMEA_FIELD_MAX_LEN];
-unsigned int nmea_string_index;
-nmea_gps_coords_t nmea_gps_coords;
+extern char nmea_string[NMEA_MAX_LEN];
+extern char nmea_field[NMEA_FIELD_MAX_LEN];
+extern unsigned int nmea_string_index;
+extern nmea_gps_coords_t nmea_gps_coords;
 
 #endif

@@ -4,9 +4,15 @@
 #include "em_usart.h"
 #include "em_gpio.h"
 
-char latitude[11];
-char longitude[11];
-char altitude[11];
+//char latitude[11];
+//char longitude[11];
+//char altitude[11];
+
+char nmea_string[NMEA_MAX_LEN];
+char nmea_field[NMEA_FIELD_MAX_LEN];
+unsigned int nmea_string_index;
+nmea_gps_coords_t nmea_gps_coords;
+
 
 void gps_power_on() {
     GPIO_PinOutSet(GPS_POWER_PORT, GPS_POWER_PIN);
