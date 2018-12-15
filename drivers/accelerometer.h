@@ -160,7 +160,11 @@ uint8_t adxl345_get_device_id(uint16_t * id);
 #define ADXL345_POWER_PORT  gpioPortB
 #define ADXL345_POWER_PIN   13
 void adxl345_power_on();
-void adxl345_setup();
+void adxl345_setup_interrupts();
+void adxl345_interrupts_off();
+void adxl345_motion_int_on();
+void adxl345_setup_for_xyz();
+void adxl345_setup_for_motion();
 
 #define ADXL345_INT1_PORT   gpioPortB //TP 18
 #define ADXL345_INT1_PIN    12

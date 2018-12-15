@@ -55,7 +55,7 @@ void adxl345_defaults() {
 }
 
 
-void adxl345_setup() {
+void adxl345_setup_interrupts() {
 
 #if 1
     //Setup interrupts for accelerometer
@@ -72,18 +72,30 @@ void adxl345_setup() {
         true, false, true);
 #endif
 
-
 //Interrupts on
    //same thing as above GPIO_IntEnable( ADXL345_INT1_PIN <<1 | ADXL345_INT2_PIN <<1 );
     NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
     NVIC_EnableIRQ(GPIO_EVEN_IRQn);
     NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
     NVIC_EnableIRQ(GPIO_ODD_IRQn);
+}
+
+inline void adxl345_interrupts_off() {
+    i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, 0);
+}
+
+inline void adxl345_motion_int_on() {
+    i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE,
+         ADXL345_REG_INT_ENABLE_ACTIVITY |
+         ADXL345_REG_INT_ENABLE_INACTIVITY);
+}
+
+void adxl345_setup_for_xyz() {
 
 #if 1
 i2c_write_register_1_byte(ADXL345_REG_DATA_FORMAT, ADXL345_REG_DATA_FORMAT_FULL_RES);
 //default 100Hz - i2c_write_register_1_byte(ADXL345_REG_BW_RATE
-i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & ADXL345_DATA_RATE_50_HZ);
+i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & ADXL345_DATA_RATE_6_25_HZ);
 
 //Clear interrupts
 i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, 0);
@@ -101,7 +113,44 @@ i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, ADXL345_REG_INT_ENABLE_DATA_RE
 i2c_write_register_1_byte(ADXL345_REG_POWER_CTL, ADXL345_REG_POWER_CTL_MEASURE);
 
 #endif
-    
+}
+
+void adxl345_setup_for_motion() {
+
+i2c_write_register_1_byte(ADXL345_REG_DATA_FORMAT, ADXL345_REG_DATA_FORMAT_FULL_RES);
+//default 100Hz - i2c_write_register_1_byte(ADXL345_REG_BW_RATE
+//i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & ADXL345_DATA_RATE_50_HZ);
+i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & ADXL345_DATA_RATE_12_5_HZ);
+
+//Clear interrupts
+i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, 0);
+
+//Set motion threshold - try 1/20g 3 x 62.5 mg = .1875G
+i2c_write_register_1_byte(ADXL345_REG_THRESH_ACT, 20);
+i2c_write_register_1_byte(ADXL345_REG_THRESH_INACT, 20);
+//i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL, ADXL345_REG_ACT_X|ADXL345_REG_ACT_Y|ADXL345_REG_ACT_Z);
+//i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL, ADXL345_REG_INACT_X|ADXL345_REG_INACT_Y|ADXL345_REG_INACT_Z);
+
+//Start out detecting both activity and inactivity
+i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+    ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
+    ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
+//inactive after 3 seconds
+i2c_write_register_1_byte(ADXL345_REG_TIME_INACT, 3);
+
+//Interrupt on motion 
+i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE,
+    ADXL345_REG_INT_ENABLE_ACTIVITY |
+    ADXL345_REG_INT_ENABLE_INACTIVITY);
+
+//Data ready interrupt on INT2
+//i2c_write_register_1_byte(ADXL345_REG_INT_MAP,ADXL345_REG_INT_ENABLE_ACTIVITY);
+
+//Clear interrupts with read
+(void) i2c_read_register(ADXL345_REG_INT_SOURCE);
+
+//Start data
+i2c_write_register_1_byte(ADXL345_REG_POWER_CTL, ADXL345_REG_POWER_CTL_MEASURE);
 
 
 }

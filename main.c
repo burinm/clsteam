@@ -126,14 +126,52 @@ while(1) {
 int8_t d;
     if (accel_int1 == 1) {
         //Keep reading until empty, then the accelerator interrupt is cleared
-        while(i2c_read_register(ADXL345_REG_INT_SOURCE) & ADXL345_REG_INT_SOURCE_DATA_READY) {
-            adxl345_read_xyz(&acc_d);
+        //This actually doesn't work
+        //while(i2c_read_register(ADXL345_REG_INT_SOURCE) & ADXL345_REG_INT_SOURCE_DATA_READY) {
+        //while(1) {
+            adxl345_read_xyz(&acc_d); //This seems to clear the interrupt when sampling low rate
             snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
             uart_print_string(USART1,string_buff1);
-        }
+        //}
+        uart_print_string(USART1,"---\n\r");
         CORE_ATOMIC_IRQ_DISABLE();
         accel_int1 = 0;
         CORE_ATOMIC_IRQ_ENABLE();
+    }
+}
+#endif
+
+#if 1 //Testing accelerometer motion detect 
+xyz_data acc_d;
+
+char string_buff1[35];
+
+while(1) {
+int8_t d;
+    if (accel_int1 == 1) {
+        adxl345_interrupts_off();
+            uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
+            if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
+                uart_print_string(USART1,"moving\n\r");
+
+                //Inactivity or Motion detection now
+                i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL, 
+                    ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
+                    ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
+            }
+
+            if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
+                uart_print_string(USART1,"stopped\n\r");
+
+                //Motion detection only now
+                i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+                    ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z);
+            }
+
+            CORE_ATOMIC_IRQ_DISABLE();
+                accel_int1 = 0;
+            CORE_ATOMIC_IRQ_ENABLE();
+        adxl345_motion_int_on();
     }
 }
 #endif

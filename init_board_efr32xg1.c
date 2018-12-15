@@ -85,7 +85,9 @@ if (! adxl345_get_device_id(&adxl345_id)) {
 adxl345_defaults();
 
 //Setup accelerometer interrupts
-adxl345_setup();
+adxl345_setup_interrupts();
+//adxl345_setup_for_xyz();
+adxl345_setup_for_motion();
 
 }
 
