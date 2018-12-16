@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="com.silabs.module.additional.pdm.com.silabs.ss.tool.ide.arm.toolchain.gnu.cdt.debug#com.silabs.ss.tool.ide.arm.toolchain.gnu.cdt:7.2.1.20170904" propertyScope="project" contentRoot=".">
+  <file name="gatt.xml" uri="studio:/project/gatt.xml"/>
+  <file name="gatt_db.c" uri="studio:/project/gatt_db.c"/>
+  <file name="gatt_db.h" uri="studio:/project/gatt_db.h"/>
+  <file name="BgBuild_Log.txt" uri="studio:/project/BgBuild_Log.txt"/>
+  <file name="init_mcu_efr32xg1.c" uri="studio:/project/init_mcu_efr32xg1.c"/>
+  <file name="init_app.c" uri="studio:/project/init_app.c"/>
+  <file name="hal-config-board.h" uri="studio:/project/hal-config-board.h"/>
+  <file name="create_bl_files.bat" uri="studio:/project/create_bl_files.bat"/>
+  <file name="board_features.h" uri="studio:/project/board_features.h"/>
+  <file name="ble-configuration.h" uri="studio:/project/ble-configuration.h"/>
+  <file name="init_board_efr32xg1.c" uri="studio:/project/init_board_efr32xg1.c"/>
+  <file name="hal-config-app-common.h" uri="studio:/project/hal-config-app-common.h"/>
+  <includePath uri="studio:/project/"/>
+  <toolOption partCompatibility=".*" toolId="iar.arm.toolchain.linker.v5.4.0" optionId="iar.arm.toolchain.linker.option.icfFile.v5.4.0" value="${workspace_loc:/${ProjName}/efr32bg1b232f256gm48.icf}"/>
+  <toolOption toolchainCompatibility="gcc" toolId="com.silabs.ide.si32.gcc.cdt.managedbuild.toolchain.exe" optionId="com.silabs.ide.si32.gcc.cdt.managedbuild.tool.gnu.c.linker.script" value="${workspace_loc:/${ProjName}/efr32bg1b232f256gm48.ld}"/>
+</project>

@@ -8,7 +8,7 @@
     <!--Device Name-->
     <characteristic id="device_name" name="Device Name" sourceId="org.bluetooth.characteristic.gap.device_name" uuid="2A00">
       <informativeText/>
-      <value length="13" type="utf-8" variable_length="false">Empty Example</value>
+      <value length="10" type="utf-8" variable_length="false">CLS Device</value>
       <properties read="true" read_requirement="optional" write="true" write_requirement="optional"/>
     </characteristic>
     
@@ -55,6 +55,18 @@
       <informativeText>Abstract: Silicon Labs OTA Control. </informativeText>
       <value length="1" type="user" variable_length="false"/>
       <properties write="true" write_requirement="optional"/>
+    </characteristic>
+  </service>
+  
+  <!--Location and Navigation-->
+  <service advertise="false" id="location_and_navigation" name="Location and Navigation" requirement="mandatory" sourceId="org.bluetooth.service.location_and_navigation" type="primary" uuid="1819">
+    <informativeText>Abstract: This service exposes location and navigation-related data from a Location and Navigation sensor intended for outdoor activity applications. Summary: The Location and Navigation Service (LN Service) exposes location and navigation-related data from a Location and Navigation sensor (Server) intended for outdoor activity applications. </informativeText>
+    
+    <!--GPS-->
+    <characteristic id="position_gps" name="GPS" sourceId="org.bluetooth.characteristic.position_quality" uuid="2A69">
+      <informativeText>Summary: The Position Quality characteristic is a variable length structure containing a Flags field and at least one of the optional data fields listed below </informativeText>
+      <value length="27" type="utf-8" variable_length="false"/>
+      <properties indicate="false" indicate_requirement="excluded" notify="true" notify_requirement="mandatory" read="false" read_requirement="excluded" reliable_write="false" reliable_write_requirement="excluded" write="false" write_no_response="false" write_no_response_requirement="excluded" write_requirement="excluded"/>
     </characteristic>
   </service>
 </gatt>

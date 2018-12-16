@@ -81,6 +81,13 @@ static const gecko_configuration_t config = {
 // Flag for indicating DFU Reset must be performed
 uint8_t boot_to_dfu = 0;
 
+//[10]  N/W -- this is representing a number where NSWE ie. 1010 is N and W while 1001 is N and E
+//[8:9] Altitude if parsed with one decimal point (multiply by 10^1)
+//[4:7] Longitude if parsed with five decimal points (multiply by 10^5)
+//[0:3] Latitude if parsed with five decimal points (multiply by 10^5)
+//uint8_t gps_data[11] = {0x0A,0x40,0x3B,0x3E,0xAD,0x1C,0x0A,0x17,0x9A,0x4A,0xC6};
+uint8_t gps_data[30] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4'};
+uint8_t *gps = gps_data;
 /**
  * @brief  Main function
  */
@@ -141,7 +148,7 @@ int8_t d;
 }
 #endif
 
-#if 1 //Testing accelerometer motion detect 
+#if 0 //Testing accelerometer motion detect
 xyz_data acc_d;
 
 char string_buff1[35];
@@ -284,7 +291,10 @@ while (1) {
           gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
         }
         break;
-
+      case gecko_evt_gatt_server_characteristic_status_id:
+    	  gecko_cmd_gatt_server_send_characteristic_notification(
+    			  evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 30, gps_data);
+    	break;
       default:
         break;
     }
