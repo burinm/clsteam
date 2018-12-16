@@ -106,7 +106,7 @@ void main(void)
 	gecko_init(&config);
 
 	//Can't connect to BLE without disabling these
-	SLEEP_SleepBlockBegin(sleepEM3); // EM3 and EM4 are blocked
+	SLEEP_SleepBlockBegin(sleepEM2); // EM3 and EM4 are blocked
 
 	uart_print_string(USART1,"CLS ready.\n\r");
 
@@ -204,6 +204,7 @@ void main(void)
 #endif
 
 	int send_ble_data=0;
+	int count =0;
 
 	led_off(LED0);
 	led_off(LED1);
@@ -241,6 +242,10 @@ void main(void)
 
                 //gps_power_off();
                 send_ble_data = 1;
+                if(count>1) {
+                    SLEEP_SleepBlockBegin(sleepEM2); // EM2 and EM3 and EM4 are blocked due to needing additional clock accuracy
+                    gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
+                }
 
                 //Motion detection only now
                 i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
@@ -278,6 +283,7 @@ void main(void)
                     /* Start general advertising and enable connections. */
                     gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
                     led_on(LED0);
+                    count++;
                     break;
 
                 case gecko_evt_le_connection_closed_id:
