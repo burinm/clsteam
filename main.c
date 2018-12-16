@@ -93,22 +93,22 @@ uint8_t gps_data[GPS_DATA_LEN] = {'A','B','C','D','E','F','G','H','I','J','K','L
  */
 void main(void)
 {
-  // Initialize device
-  initMcu();
-  // Initialize board
-  initBoard();
-  // Initialize application
-  initApp();
+	// Initialize device
+	initMcu();
+	// Initialize board
+	initBoard();
+	// Initialize application
+	initApp();
 
-  led_on(LED0);
+	led_on(LED0);
 
-  // Initialize stack
-  gecko_init(&config);
+	// Initialize stack
+	gecko_init(&config);
 
- //Can't connect to BLE without disabling these
- SLEEP_SleepBlockBegin(sleepEM3); // EM3 and EM4 are blocked
+	//Can't connect to BLE without disabling these
+	SLEEP_SleepBlockBegin(sleepEM3); // EM3 and EM4 are blocked
 
- uart_print_string(USART1,"CLS ready.\n\r");
+	uart_print_string(USART1,"CLS ready.\n\r");
 
 #if 0
 	//Test UART0
@@ -116,7 +116,7 @@ void main(void)
 
 		char hello_world[] = "Hello world.";
 		for (int i=0; i< strlen(hello_world); i++) {
-		 USART_Tx(USART1,hello_world[i]);
+			USART_Tx(USART1,hello_world[i]);
 		}
 
 		//USART_Tx(USART0,USART_Rx(USART0));
@@ -195,16 +195,16 @@ void main(void)
 #if 0 //testing general GPIO interrupts
 	while(1) {
 		if (accel_int1 == 1) {
-				uart_print_string(USART1,"int1\n\r");
-				CORE_ATOMIC_IRQ_DISABLE();
-				accel_int1 = 0;
-				CORE_ATOMIC_IRQ_ENABLE();
+			uart_print_string(USART1,"int1\n\r");
+			CORE_ATOMIC_IRQ_DISABLE();
+			accel_int1 = 0;
+			CORE_ATOMIC_IRQ_ENABLE();
 		}
 		if (accel_int2 == 1) {
-				uart_print_string(USART1,"int2\n\r");
-				CORE_ATOMIC_IRQ_DISABLE();
-				accel_int2 = 0;
-				CORE_ATOMIC_IRQ_ENABLE();
+			uart_print_string(USART1,"int2\n\r");
+			CORE_ATOMIC_IRQ_DISABLE();
+			accel_int2 = 0;
+			CORE_ATOMIC_IRQ_ENABLE();
 		}
 	}
 #endif
@@ -277,14 +277,14 @@ void main(void)
 
 				/* Check if need to boot to dfu mode */
 				if (boot_to_dfu) {
-				  /* Enter to DFU OTA mode */
-				  gecko_cmd_system_reset(2);
+					/* Enter to DFU OTA mode */
+					gecko_cmd_system_reset(2);
 				} else {
-				  ///* Restart advertising after client has disconnected */
-				  //gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
-				  SLEEP_SleepBlockEnd(sleepEM2);
-				  send_ble_data = 0;
-				  led_off(LED0);
+					///* Restart advertising after client has disconnected */
+					//gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
+					SLEEP_SleepBlockEnd(sleepEM2);
+					send_ble_data = 0;
+					led_off(LED0);
 				}
 				break;
 
@@ -300,9 +300,9 @@ void main(void)
 				  boot_to_dfu = 1;
 				  /* Send response to Write Request */
 				  gecko_cmd_gatt_server_send_user_write_response(
-					evt->data.evt_gatt_server_user_write_request.connection,
-					gattdb_ota_control,
-					bg_err_success);
+						  evt->data.evt_gatt_server_user_write_request.connection,
+						  gattdb_ota_control,
+						  bg_err_success);
 
 				  /* Close connection to enter to DFU OTA mode */
 				  gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
@@ -310,7 +310,7 @@ void main(void)
 				break;
 			case gecko_evt_gatt_server_characteristic_status_id:
 				gecko_cmd_gatt_server_send_characteristic_notification(
-						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 30, gps_data);
+						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, GPS_DATA_LEN, gps_data);
 				//once the notification occurs, we should disconnect (and leave ble loop) to save energy
 				gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
 
