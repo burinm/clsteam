@@ -81,17 +81,13 @@ static const gecko_configuration_t config = {
 // Flag for indicating DFU Reset must be performed
 uint8_t boot_to_dfu = 0;
 
-//[10]  N/W -- this is representing a number where NSWE ie. 1010 is N and W while 1001 is N and E
-//[8:9] Altitude if parsed with one decimal point (multiply by 10^1)
-//[4:7] Longitude if parsed with five decimal points (multiply by 10^5)
-//[0:3] Latitude if parsed with five decimal points (multiply by 10^5)
-#define BLE_LATITUDE_LEN       11
+#define BLE_LATITUDE_LEN  		11
 #define BLE_LONGITUDE_LEN       11
 #define BLE_ALTITUDE_LEN        6
 #define BLE_EW_INDICATOR_LEN    2
-
-#define GPS_DATA_LEN    30
+#define GPS_DATA_LEN    		30
 uint8_t gps_data[GPS_DATA_LEN] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4'};
+
 /**
  * @brief  Main function
  */
@@ -111,207 +107,226 @@ void main(void)
 
  //Can't connect to BLE without disabling these
  SLEEP_SleepBlockBegin(sleepEM3); // EM3 and EM4 are blocked
- SLEEP_SleepBlockBegin(sleepEM2); // EM2, EM3 and EM4 are blocked
 
  uart_print_string(USART1,"CLS ready.\n\r");
 
 #if 0
- //Test UART0
- while(1) {
+	//Test UART0
+	while(1) {
 
-     char hello_world[] = "Hello world.";
-     for (int i=0; i< strlen(hello_world); i++) {
-         USART_Tx(USART1,hello_world[i]);
-     }
+		char hello_world[] = "Hello world.";
+		for (int i=0; i< strlen(hello_world); i++) {
+		 USART_Tx(USART1,hello_world[i]);
+		}
 
-     //USART_Tx(USART0,USART_Rx(USART0));
- }
+		//USART_Tx(USART0,USART_Rx(USART0));
+	}
 #endif
 
 #if 0 //Testing accelerometer data ready interrupt
-xyz_data acc_d;
+	xyz_data acc_d;
 
-char string_buff1[35];
+	char string_buff1[35];
 
-while(1) {
-int8_t d;
-    if (accel_int1 == 1) {
-        //Keep reading until empty, then the accelerator interrupt is cleared
-        //This actually doesn't work
-        //while(i2c_read_register(ADXL345_REG_INT_SOURCE) & ADXL345_REG_INT_SOURCE_DATA_READY) {
-        //while(1) {
-            adxl345_read_xyz(&acc_d); //This seems to clear the interrupt when sampling low rate
-            snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
-            uart_print_string(USART1,string_buff1);
-        //}
-        uart_print_string(USART1,"---\n\r");
-        CORE_ATOMIC_IRQ_DISABLE();
-        accel_int1 = 0;
-        CORE_ATOMIC_IRQ_ENABLE();
-    }
-}
+	while(1) {
+	int8_t d;
+		if (accel_int1 == 1) {
+			//Keep reading until empty, then the accelerator interrupt is cleared
+			//This actually doesn't work
+			//while(i2c_read_register(ADXL345_REG_INT_SOURCE) & ADXL345_REG_INT_SOURCE_DATA_READY) {
+			//while(1) {
+				adxl345_read_xyz(&acc_d); //This seems to clear the interrupt when sampling low rate
+				snprintf(string_buff1,35,"x: %+0.6d y: %+0.6d z: %+0.6d\n\r", acc_d.x, acc_d.y, acc_d.z);
+				uart_print_string(USART1,string_buff1);
+			//}
+			uart_print_string(USART1,"---\n\r");
+			CORE_ATOMIC_IRQ_DISABLE();
+			accel_int1 = 0;
+			CORE_ATOMIC_IRQ_ENABLE();
+		}
+	}
 #endif
 
 #if 0 //GPS/accelerometer send
-while(1) {
-    if (accel_int1 == 1) {
-        adxl345_interrupts_off();
-        uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
-        if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
-            uart_print_string(USART1,"moving\n\r");
+	while(1) {
+		if (accel_int1 == 1) {
+			adxl345_interrupts_off();
+			uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
+			if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
+				uart_print_string(USART1,"moving\n\r");
 
-            //Inactivity or Motion detection now
-            i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
-                    ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
-                    ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
-        }
+				//Inactivity or Motion detection now
+				i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+						ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
+						ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
+			}
 
-        if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
-            gps_power_on(); //Boo! resets board
-            uart_print_string(USART1,"stopped\n\r");
-            gps_print_location();
+			if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
+				gps_power_on(); //Boo! resets board
+				uart_print_string(USART1,"stopped\n\r");
+				gps_print_location();
 
-            //Format GPS for BLE transmission
-            char* p=gps_data;
-            strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
-            p+=BLE_LATITUDE_LEN;
-            strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
-            p+=BLE_LONGITUDE_LEN;
-            strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
-            p+=BLE_ALTITUDE_LEN;
-            strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
+				//Format GPS for BLE transmission
+				char* p=gps_data;
+				strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
+				p+=BLE_LATITUDE_LEN;
+				strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
+				p+=BLE_LONGITUDE_LEN;
+				strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
+				p+=BLE_ALTITUDE_LEN;
+				strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
 
-            gps_power_off();
+				gps_power_off();
 
-            //Motion detection only now
-            i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
-                    ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z);
-        }
+				//Motion detection only now
+				i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+						ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z);
+			}
 
-        CORE_ATOMIC_IRQ_DISABLE();
-        accel_int1 = 0;
-        CORE_ATOMIC_IRQ_ENABLE();
-        adxl345_motion_int_on();
-    }
-}
+			CORE_ATOMIC_IRQ_DISABLE();
+			accel_int1 = 0;
+			CORE_ATOMIC_IRQ_ENABLE();
+			adxl345_motion_int_on();
+		}
+	}
 #endif
 
 
 #if 0 //testing general GPIO interrupts
-while(1) {
-    if (accel_int1 == 1) {
-            uart_print_string(USART1,"int1\n\r");
-            CORE_ATOMIC_IRQ_DISABLE();
-            accel_int1 = 0;
-            CORE_ATOMIC_IRQ_ENABLE();
-    }
-    if (accel_int2 == 1) {
-            uart_print_string(USART1,"int2\n\r");
-            CORE_ATOMIC_IRQ_DISABLE();
-            accel_int2 = 0;
-            CORE_ATOMIC_IRQ_ENABLE();
-    }
-}
+	while(1) {
+		if (accel_int1 == 1) {
+				uart_print_string(USART1,"int1\n\r");
+				CORE_ATOMIC_IRQ_DISABLE();
+				accel_int1 = 0;
+				CORE_ATOMIC_IRQ_ENABLE();
+		}
+		if (accel_int2 == 1) {
+				uart_print_string(USART1,"int2\n\r");
+				CORE_ATOMIC_IRQ_DISABLE();
+				accel_int2 = 0;
+				CORE_ATOMIC_IRQ_ENABLE();
+		}
+	}
 #endif
 
 #if 0 //Test GPS TX -> UART1
-while(1) {
-    USART_Tx(USART1,USART_Rx(USART0));
-}
+	while(1) {
+		USART_Tx(USART1,USART_Rx(USART0));
+	}
 #endif
 
 #if 0 //Test GPS data parser
-while (1) {
-    gps_run_main_seq();
+	while (1) {
+		gps_run_main_seq();
 
-    uart_print_string(USART1, "latitude:");
-    uart_print_string(USART1, nmea_gps_coords.latitude);
-    uart_print_string(USART1, "\n\r");
+		uart_print_string(USART1, "latitude:");
+		uart_print_string(USART1, nmea_gps_coords.latitude);
+		uart_print_string(USART1, "\n\r");
 
-    uart_print_string(USART1, "longitude:");
-    uart_print_string(USART1, nmea_gps_coords.longitude);
-    uart_print_string(USART1, "\n\r");
+		uart_print_string(USART1, "longitude:");
+		uart_print_string(USART1, nmea_gps_coords.longitude);
+		uart_print_string(USART1, "\n\r");
 
-    uart_print_string(USART1, "altitude:");
-    uart_print_string(USART1, nmea_gps_coords.altitude);
-    uart_print_string(USART1, "\n\r");
+		uart_print_string(USART1, "altitude:");
+		uart_print_string(USART1, nmea_gps_coords.altitude);
+		uart_print_string(USART1, "\n\r");
 
-    uart_print_string(USART1, "ns:");
-    uart_print_string(USART1, nmea_gps_coords.ns_indicator);
-    uart_print_string(USART1, "\n\r");
+		uart_print_string(USART1, "ns:");
+		uart_print_string(USART1, nmea_gps_coords.ns_indicator);
+		uart_print_string(USART1, "\n\r");
 
-    uart_print_string(USART1, "ew:");
-    uart_print_string(USART1, nmea_gps_coords.ew_indicator);
-    uart_print_string(USART1, "\n\r");
-}
+		uart_print_string(USART1, "ew:");
+		uart_print_string(USART1, nmea_gps_coords.ew_indicator);
+		uart_print_string(USART1, "\n\r");
+	}
 #endif
 
-  while (1) {
-    /* Event pointer for handling events */
-    struct gecko_cmd_packet* evt;
+	int send_ble_data = 1;
 
-    /* Check for stack event. */
-    evt = gecko_wait_event();
+	led_off(LED0);
+	led_off(LED1);
+	led_off(LED2);
+	while (send_ble_data) {
+		/* Event pointer for handling events */
+		struct gecko_cmd_packet* evt;
 
-    /* Handle events */
-    switch (BGLIB_MSG_ID(evt->header)) {
-      /* This boot event is generated when the system boots up after reset.
-       * Do not call any stack commands before receiving the boot event.
-       * Here the system is set to start advertising immediately after boot procedure. */
-      case gecko_evt_system_boot_id:
+		/* Check for stack event. */
+		evt = gecko_wait_event();
 
-        /* Set advertising parameters. 100ms advertisement interval.
-         * The first parameter is advertising set handle
-         * The next two parameters are minimum and maximum advertising interval, both in
-         * units of (milliseconds * 1.6).
-         * The last two parameters are duration and maxevents left as default. */
-        gecko_cmd_le_gap_set_advertise_timing(0, 160, 160, 0, 0);
+		/* Handle events */
+		switch (BGLIB_MSG_ID(evt->header)) {
+			/* This boot event is generated when the system boots up after reset.
+			* Do not call any stack commands before receiving the boot event.
+			* Here the system is set to start advertising immediately after boot procedure. */
+			case gecko_evt_system_boot_id:
+				 SLEEP_SleepBlockBegin(sleepEM2); // EM2 and EM3 and EM4 are blocked due to needing additional clock accuracy
 
-        /* Start general advertising and enable connections. */
-        gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
-        break;
+				/* Set advertising parameters. 100ms advertisement interval.
+				 * The first parameter is advertising set handle
+				 * The next two parameters are minimum and maximum advertising interval, both in
+				 * units of (milliseconds * 1.6).
+				 * The last two parameters are duration and maxevents left as default. */
+				gecko_cmd_le_gap_set_advertise_timing(0, 160, 160, 0, 0);
 
-      case gecko_evt_le_connection_closed_id:
+				/* Start general advertising and enable connections. */
+				gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
+				led_on(LED0);
+				break;
 
-        /* Check if need to boot to dfu mode */
-        if (boot_to_dfu) {
-          /* Enter to DFU OTA mode */
-          gecko_cmd_system_reset(2);
-        } else {
-          /* Restart advertising after client has disconnected */
-          gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
-        }
-        break;
+			case gecko_evt_le_connection_closed_id:
 
-      /* Events related to OTA upgrading
-         ----------------------------------------------------------------------------- */
+				/* Check if need to boot to dfu mode */
+				if (boot_to_dfu) {
+				  /* Enter to DFU OTA mode */
+				  gecko_cmd_system_reset(2);
+				} else {
+				  ///* Restart advertising after client has disconnected */
+				  //gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
+				  SLEEP_SleepBlockEnd(sleepEM2);
+				  send_ble_data = 0;
+				  led_off(LED0);
+				}
+				break;
 
-      /* Check if the user-type OTA Control Characteristic was written.
-       * If ota_control was written, boot the device into Device Firmware Upgrade (DFU) mode. */
-      case gecko_evt_gatt_server_user_write_request_id:
+			/* Events related to OTA upgrading
+			 ----------------------------------------------------------------------------- */
 
-        if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_ota_control) {
-          /* Set flag to enter to OTA mode */
-          boot_to_dfu = 1;
-          /* Send response to Write Request */
-          gecko_cmd_gatt_server_send_user_write_response(
-            evt->data.evt_gatt_server_user_write_request.connection,
-            gattdb_ota_control,
-            bg_err_success);
+			/* Check if the user-type OTA Control Characteristic was written.
+			* If ota_control was written, boot the device into Device Firmware Upgrade (DFU) mode. */
+			case gecko_evt_gatt_server_user_write_request_id:
 
-          /* Close connection to enter to DFU OTA mode */
-          gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
-        }
-        break;
-      case gecko_evt_gatt_server_characteristic_status_id:
-    	  gecko_cmd_gatt_server_send_characteristic_notification(
-                       evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, GPS_DATA_LEN, gps_data);
-    	break;
-      default:
-        break;
-    }
-  }
+				if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_ota_control) {
+				  /* Set flag to enter to OTA mode */
+				  boot_to_dfu = 1;
+				  /* Send response to Write Request */
+				  gecko_cmd_gatt_server_send_user_write_response(
+					evt->data.evt_gatt_server_user_write_request.connection,
+					gattdb_ota_control,
+					bg_err_success);
+
+				  /* Close connection to enter to DFU OTA mode */
+				  gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
+				}
+				break;
+			case gecko_evt_gatt_server_characteristic_status_id:
+				gecko_cmd_gatt_server_send_characteristic_notification(
+						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 30, gps_data);
+				//once the notification occurs, we should disconnect (and leave ble loop) to save energy
+				gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
+
+				break;
+			default:
+				break;
+		}
+	}
+
+	while(1) {
+		led_on(LED1);
+		led_on(LED2);
+	}
 }
+
+
 
 /** @} (end addtogroup app) */
 /** @} (end addtogroup Application) */
