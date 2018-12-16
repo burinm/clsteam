@@ -47,10 +47,11 @@ void initBoard(void)
   //Setup load switch pin for GPS
   GPIO_PinModeSet(GPS_POWER_PORT, GPS_POWER_PIN, gpioModePushPull, false);
 
+  //Turn on GPS early, big current inrush
+  gps_power_on();
+
   init_leds();
 
-  //Turn on GPS early, big current inrush
-    gps_power_on();
 
 #if 1
   UART0_init();

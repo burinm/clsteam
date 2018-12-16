@@ -149,45 +149,7 @@ void main(void)
 
 #if 0 //GPS/accelerometer send
 	while(1) {
-		if (accel_int1 == 1) {
-			adxl345_interrupts_off();
-			uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
-			if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
-				uart_print_string(USART1,"moving\n\r");
 
-				//Inactivity or Motion detection now
-				i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
-						ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
-						ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
-			}
-
-			if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
-				gps_power_on(); //Boo! resets board
-				uart_print_string(USART1,"stopped\n\r");
-				gps_print_location();
-
-				//Format GPS for BLE transmission
-				char* p=gps_data;
-				strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
-				p+=BLE_LATITUDE_LEN;
-				strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
-				p+=BLE_LONGITUDE_LEN;
-				strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
-				p+=BLE_ALTITUDE_LEN;
-				strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
-
-				gps_power_off();
-
-				//Motion detection only now
-				i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
-						ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z);
-			}
-
-			CORE_ATOMIC_IRQ_DISABLE();
-			accel_int1 = 0;
-			CORE_ATOMIC_IRQ_ENABLE();
-			adxl345_motion_int_on();
-		}
 	}
 #endif
 
@@ -241,89 +203,131 @@ void main(void)
 	}
 #endif
 
-	int send_ble_data = 1;
+	int send_ble_data=0;
 
 	led_off(LED0);
 	led_off(LED1);
 	led_off(LED2);
-	while (send_ble_data) {
-		/* Event pointer for handling events */
-		struct gecko_cmd_packet* evt;
 
-		/* Check for stack event. */
-		evt = gecko_wait_event();
+    while(1) {
+        if (accel_int1 == 1) {
+            adxl345_interrupts_off();
+            uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
+            if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
+                uart_print_string(USART1,"moving\n\r");
 
-		/* Handle events */
-		switch (BGLIB_MSG_ID(evt->header)) {
-			/* This boot event is generated when the system boots up after reset.
-			* Do not call any stack commands before receiving the boot event.
-			* Here the system is set to start advertising immediately after boot procedure. */
-			case gecko_evt_system_boot_id:
-				 SLEEP_SleepBlockBegin(sleepEM2); // EM2 and EM3 and EM4 are blocked due to needing additional clock accuracy
+                //Inactivity or Motion detection now
+                i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+                        ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
+                        ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
+            }
 
-				/* Set advertising parameters. 100ms advertisement interval.
-				 * The first parameter is advertising set handle
-				 * The next two parameters are minimum and maximum advertising interval, both in
-				 * units of (milliseconds * 1.6).
-				 * The last two parameters are duration and maxevents left as default. */
-				gecko_cmd_le_gap_set_advertise_timing(0, 160, 160, 0, 0);
+            if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
+                //gps_power_on(); //Boo! resets board
+                uart_print_string(USART1,"stopped\n\r");
+                //gps_print_location();
+                gps_run_main_seq();
+                uart_print_string(USART1,"got data...");
 
-				/* Start general advertising and enable connections. */
-				gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
-				led_on(LED0);
-				break;
+                //Format GPS for BLE transmission
+                char* p=gps_data;
+                strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
+                p+=BLE_LATITUDE_LEN;
+                strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
+                p+=BLE_LONGITUDE_LEN;
+                strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
+                p+=BLE_ALTITUDE_LEN;
+                strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
 
-			case gecko_evt_le_connection_closed_id:
+                //gps_power_off();
+                send_ble_data = 1;
 
-				/* Check if need to boot to dfu mode */
-				if (boot_to_dfu) {
-					/* Enter to DFU OTA mode */
-					gecko_cmd_system_reset(2);
-				} else {
-					///* Restart advertising after client has disconnected */
-					//gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
-					SLEEP_SleepBlockEnd(sleepEM2);
-					send_ble_data = 0;
-					led_off(LED0);
-				}
-				break;
+                //Motion detection only now
+                i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+                        ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z);
+            }
 
-			/* Events related to OTA upgrading
-			 ----------------------------------------------------------------------------- */
+            CORE_ATOMIC_IRQ_DISABLE();
+            accel_int1 = 0;
+            CORE_ATOMIC_IRQ_ENABLE();
+            adxl345_motion_int_on();
+        }
 
-			/* Check if the user-type OTA Control Characteristic was written.
-			* If ota_control was written, boot the device into Device Firmware Upgrade (DFU) mode. */
-			case gecko_evt_gatt_server_user_write_request_id:
+        while (send_ble_data) {
+            /* Event pointer for handling events */
+            struct gecko_cmd_packet* evt;
 
-				if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_ota_control) {
-				  /* Set flag to enter to OTA mode */
-				  boot_to_dfu = 1;
-				  /* Send response to Write Request */
-				  gecko_cmd_gatt_server_send_user_write_response(
-						  evt->data.evt_gatt_server_user_write_request.connection,
-						  gattdb_ota_control,
-						  bg_err_success);
+            /* Check for stack event. */
+            evt = gecko_wait_event();
 
-				  /* Close connection to enter to DFU OTA mode */
-				  gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
-				}
-				break;
-			case gecko_evt_gatt_server_characteristic_status_id:
-				gecko_cmd_gatt_server_send_characteristic_notification(
-						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, GPS_DATA_LEN, gps_data);
-				//once the notification occurs, we should disconnect (and leave ble loop) to save energy
-				gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
+            /* Handle events */
+            switch (BGLIB_MSG_ID(evt->header)) {
+                /* This boot event is generated when the system boots up after reset.
+                * Do not call any stack commands before receiving the boot event.
+                * Here the system is set to start advertising immediately after boot procedure. */
+                case gecko_evt_system_boot_id:
+                     SLEEP_SleepBlockBegin(sleepEM2); // EM2 and EM3 and EM4 are blocked due to needing additional clock accuracy
 
-				break;
-			default:
-				break;
-		}
-	}
+                    /* Set advertising parameters. 100ms advertisement interval.
+                     * The first parameter is advertising set handle
+                     * The next two parameters are minimum and maximum advertising interval, both in
+                     * units of (milliseconds * 1.6).
+                     * The last two parameters are duration and maxevents left as default. */
+                    gecko_cmd_le_gap_set_advertise_timing(0, 160, 160, 0, 0);
 
-	while(1) {
-		led_on(LED1);
-		led_on(LED2);
-	}
+                    /* Start general advertising and enable connections. */
+                    gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
+                    led_on(LED0);
+                    break;
+
+                case gecko_evt_le_connection_closed_id:
+
+                    /* Check if need to boot to dfu mode */
+                    if (boot_to_dfu) {
+                        /* Enter to DFU OTA mode */
+                        gecko_cmd_system_reset(2);
+                    } else {
+                        ///* Restart advertising after client has disconnected */
+                        //gecko_cmd_le_gap_start_advertising(0, le_gap_general_discoverable, le_gap_connectable_scannable);
+                        SLEEP_SleepBlockEnd(sleepEM2);
+                        send_ble_data = 0;
+                        led_off(LED0);
+                    }
+                    break;
+
+                /* Events related to OTA upgrading
+                 ----------------------------------------------------------------------------- */
+
+                /* Check if the user-type OTA Control Characteristic was written.
+                * If ota_control was written, boot the device into Device Firmware Upgrade (DFU) mode. */
+                case gecko_evt_gatt_server_user_write_request_id:
+
+                    if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_ota_control) {
+                      /* Set flag to enter to OTA mode */
+                      boot_to_dfu = 1;
+                      /* Send response to Write Request */
+                      gecko_cmd_gatt_server_send_user_write_response(
+                              evt->data.evt_gatt_server_user_write_request.connection,
+                              gattdb_ota_control,
+                              bg_err_success);
+
+                      /* Close connection to enter to DFU OTA mode */
+                      gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
+                    }
+                    break;
+                case gecko_evt_gatt_server_characteristic_status_id:
+                    gecko_cmd_gatt_server_send_characteristic_notification(
+                            evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, GPS_DATA_LEN, gps_data);
+                    //once the notification occurs, we should disconnect (and leave ble loop) to save energy
+                    gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
 }
 
 
