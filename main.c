@@ -85,9 +85,13 @@ uint8_t boot_to_dfu = 0;
 //[8:9] Altitude if parsed with one decimal point (multiply by 10^1)
 //[4:7] Longitude if parsed with five decimal points (multiply by 10^5)
 //[0:3] Latitude if parsed with five decimal points (multiply by 10^5)
-//uint8_t gps_data[11] = {0x0A,0x40,0x3B,0x3E,0xAD,0x1C,0x0A,0x17,0x9A,0x4A,0xC6};
-uint8_t gps_data[30] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4'};
-uint8_t *gps = gps_data;
+#define BLE_LATITUDE_LEN       11
+#define BLE_LONGITUDE_LEN       11
+#define BLE_ALTITUDE_LEN        6
+#define BLE_EW_INDICATOR_LEN    2
+
+#define GPS_DATA_LEN    30
+uint8_t gps_data[GPS_DATA_LEN] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4'};
 /**
  * @brief  Main function
  */
@@ -148,40 +152,50 @@ int8_t d;
 }
 #endif
 
-#if 0 //Testing accelerometer motion detect
-xyz_data acc_d;
-
-char string_buff1[35];
-
+#if 0 //GPS/accelerometer send
 while(1) {
-int8_t d;
     if (accel_int1 == 1) {
         adxl345_interrupts_off();
-            uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
-            if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
-                uart_print_string(USART1,"moving\n\r");
+        uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
+        if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
+            uart_print_string(USART1,"moving\n\r");
 
-                //Inactivity or Motion detection now
-                i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL, 
+            //Inactivity or Motion detection now
+            i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
                     ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z |
                     ADXL345_REG_INACT_X | ADXL345_REG_INACT_Y | ADXL345_REG_INACT_Z);
-            }
+        }
 
-            if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
-                uart_print_string(USART1,"stopped\n\r");
+        if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
+            gps_power_on(); //Boo! resets board
+            uart_print_string(USART1,"stopped\n\r");
+            gps_print_location();
 
-                //Motion detection only now
-                i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
+            //Format GPS for BLE transmission
+            char* p=gps_data;
+            strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
+            p+=BLE_LATITUDE_LEN;
+            strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
+            p+=BLE_LONGITUDE_LEN;
+            strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
+            p+=BLE_ALTITUDE_LEN;
+            strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
+
+            gps_power_off();
+
+            //Motion detection only now
+            i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
                     ADXL345_REG_ACT_X | ADXL345_REG_ACT_Y | ADXL345_REG_ACT_Z);
-            }
+        }
 
-            CORE_ATOMIC_IRQ_DISABLE();
-                accel_int1 = 0;
-            CORE_ATOMIC_IRQ_ENABLE();
+        CORE_ATOMIC_IRQ_DISABLE();
+        accel_int1 = 0;
+        CORE_ATOMIC_IRQ_ENABLE();
         adxl345_motion_int_on();
     }
 }
 #endif
+
 
 #if 0 //testing general GPIO interrupts
 while(1) {
@@ -231,8 +245,6 @@ while (1) {
     uart_print_string(USART1, "\n\r");
 }
 #endif
-
-
 
   while (1) {
     /* Event pointer for handling events */
@@ -293,7 +305,7 @@ while (1) {
         break;
       case gecko_evt_gatt_server_characteristic_status_id:
     	  gecko_cmd_gatt_server_send_characteristic_notification(
-    			  evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 30, gps_data);
+                       evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, GPS_DATA_LEN, gps_data);
     	break;
       default:
         break;

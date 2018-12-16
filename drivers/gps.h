@@ -144,5 +144,7 @@ void gps_wait_for_valid_data();
 void gps_get_nmea_message();
 void shutdown_gps();
 
+void gps_print_location();
+
 
 #endif

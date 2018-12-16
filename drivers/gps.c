@@ -3,6 +3,7 @@
 #include "em_emu.h"
 #include "em_usart.h"
 #include "em_gpio.h"
+#include "usart.h"
 
 //char latitude[11];
 //char longitude[11];
@@ -52,4 +53,28 @@ void gps_get_nmea_message()
 void shutdown_gps()
 {
   //GPIO_PortOutClear();
+}
+
+void gps_print_location() {
+    gps_run_main_seq();
+
+    uart_print_string(USART1, "latitude:");
+    uart_print_string(USART1, nmea_gps_coords.latitude);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "longitude:");
+    uart_print_string(USART1, nmea_gps_coords.longitude);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "altitude:");
+    uart_print_string(USART1, nmea_gps_coords.altitude);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "ns:");
+    uart_print_string(USART1, nmea_gps_coords.ns_indicator);
+    uart_print_string(USART1, "\n\r");
+
+    uart_print_string(USART1, "ew:");
+    uart_print_string(USART1, nmea_gps_coords.ew_indicator);
+    uart_print_string(USART1, "\n\r");
 }
