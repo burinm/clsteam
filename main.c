@@ -83,9 +83,11 @@ uint8_t boot_to_dfu = 0;
 #define BLE_LATITUDE_LEN  		11
 #define BLE_LONGITUDE_LEN       11
 #define BLE_ALTITUDE_LEN        6
-#define BLE_EW_INDICATOR_LEN    2
-#define GPS_DATA_LEN    		30
-uint8_t gps_data[GPS_DATA_LEN] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4'};
+#define BLE_NS_INDICATOR_LEN    1
+#define BLE_EW_INDICATOR_LEN    1
+#define GPS_DATA_LEN    		31
+uint8_t gps_data[GPS_DATA_LEN] = { 0 };
+
 
 /**
  * @brief  Main function
@@ -250,7 +252,7 @@ void main(void)
 				break;
 			case gecko_evt_gatt_server_characteristic_status_id:
 				gecko_cmd_gatt_server_send_characteristic_notification(
-						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, GPS_DATA_LEN, gps_data);
+						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 31, gps_data);
 				//once the notification occurs, we should disconnect (and leave ble loop) to save energy
 				gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
 				break;
@@ -277,13 +279,31 @@ void main(void)
 
 							//Format GPS for BLE transmission
 							char* p=gps_data;
+                            int i;
+
+                            for(i=0;i<BLE_LATITUDE_LEN - strlen(nmea_gps_coords.latitude);i++) {
+                                *p++='0';
+                            }
 							strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
 							p+=BLE_LATITUDE_LEN;
+
+                            for(i=0;i<BLE_LONGITUDE_LEN - strlen(nmea_gps_coords.longitude);i++) {
+                                *p++='0';
+                            }
 							strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
 							p+=BLE_LONGITUDE_LEN;
+
+                            for(i=0;i<BLE_ALTITUDE_LEN - strlen(nmea_gps_coords.altitude);i++) {
+                                *p++='0';
+                            }
 							strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
 							p+=BLE_ALTITUDE_LEN;
+
+							strncpy(p, nmea_gps_coords.ns_indicator,BLE_NS_INDICATOR_LEN);
+                            p+=BLE_NS_INDICATOR_LEN;
 							strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
+                            p+=BLE_EW_INDICATOR_LEN;
+                            *p='/0';
 
 							//gps_power_off();
 
