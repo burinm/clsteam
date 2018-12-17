@@ -172,6 +172,10 @@ void adxl345_setup_for_motion();
 #define ADXL345_INT2_PORT   gpioPortB //TP 19
 #define ADXL345_INT2_PIN    11
 
+//Used to schedule external events through gecko_external_signal
+#define ACCEL_INT1  			1
+#define ACCEL_INT2  			2
+
 typedef struct {
     int16_t x;
     int16_t y;
