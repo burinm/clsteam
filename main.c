@@ -252,7 +252,7 @@ void main(void)
 				break;
 			case gecko_evt_gatt_server_characteristic_status_id:
 				gecko_cmd_gatt_server_send_characteristic_notification(
-						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 31, gps_data);
+						evt->data.evt_gatt_server_user_write_request.connection, gattdb_position_gps, 30, gps_data);
 				//once the notification occurs, we should disconnect (and leave ble loop) to save energy
 				gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
 				break;
@@ -271,7 +271,7 @@ void main(void)
 						}
 
 						if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
-							//gps_power_on(); //Boo! resets board
+							gps_power_on(); //Boo! resets board
 							uart_print_string(USART1,"stopped\n\r");
 							//gps_print_location();
 							gps_run_main_seq();
@@ -280,32 +280,39 @@ void main(void)
 							//Format GPS for BLE transmission
 							char* p=gps_data;
                             int i;
+                            uint8_t field_size;
 
-                            for(i=0;i<BLE_LATITUDE_LEN - strlen(nmea_gps_coords.latitude);i++) {
-                                *p++='0';
+                            field_size = strlen(nmea_gps_coords.latitude);
+                            for(i=0;i<BLE_LATITUDE_LEN - field_size;i++) {
+                                *p='0';
+                                p++;
                             }
-							strncpy(p, nmea_gps_coords.latitude,BLE_LATITUDE_LEN);
-							p+=BLE_LATITUDE_LEN;
+							memcpy(p, nmea_gps_coords.latitude,field_size);
+							p+=field_size;
 
-                            for(i=0;i<BLE_LONGITUDE_LEN - strlen(nmea_gps_coords.longitude);i++) {
-                                *p++='0';
+                            field_size = strlen(nmea_gps_coords.longitude);
+                            for(i=0;i<BLE_LONGITUDE_LEN - field_size;i++) {
+                                *p='0';
+                                p++;
                             }
-							strncpy(p, nmea_gps_coords.longitude,BLE_LONGITUDE_LEN);
-							p+=BLE_LONGITUDE_LEN;
+							memcpy(p, nmea_gps_coords.longitude,field_size);
+							p+=field_size;
 
-                            for(i=0;i<BLE_ALTITUDE_LEN - strlen(nmea_gps_coords.altitude);i++) {
-                                *p++='0';
+                            field_size = strlen(nmea_gps_coords.altitude);
+                            for(i=0;i<BLE_ALTITUDE_LEN - field_size;i++) {
+                                *p='0';
+                                p++;
                             }
-							strncpy(p, nmea_gps_coords.altitude,BLE_ALTITUDE_LEN);
-							p+=BLE_ALTITUDE_LEN;
+							memcpy(p, nmea_gps_coords.altitude,field_size);
+							p+=field_size;
 
-							strncpy(p, nmea_gps_coords.ns_indicator,BLE_NS_INDICATOR_LEN);
+							memcpy(p, nmea_gps_coords.ns_indicator,BLE_NS_INDICATOR_LEN);
                             p+=BLE_NS_INDICATOR_LEN;
-							strncpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
+							memcpy(p, nmea_gps_coords.ew_indicator,BLE_EW_INDICATOR_LEN);
                             p+=BLE_EW_INDICATOR_LEN;
                             *p='/0';
 
-							//gps_power_off();
+							gps_power_off();
 
 
 							//Motion detection only now
