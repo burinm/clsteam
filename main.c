@@ -39,6 +39,7 @@
 #include "bspconfig.h"
 #endif
 
+#include "main.h"
 #include "leds.h"
 #include "accelerometer.h"
 #include "gps.h"
@@ -109,7 +110,9 @@ void main(void)
 	//Can't connect to BLE without disabling these
 	SLEEP_SleepBlockBegin(sleepEM2); // EM3 and EM4 are blocked
 
+#ifdef DEBUG_ON
 	uart_print_string(USART1,"CLS ready.\n\r");
+#endif
 
 #if 0
 	//Test UART0
@@ -262,7 +265,10 @@ void main(void)
 						adxl345_interrupts_off();
 						uint8_t reason = i2c_read_register(ADXL345_REG_INT_SOURCE);
 						if (reason & ADXL345_REG_INT_SOURCE_ACTIVITY) {
-							uart_print_string(USART1,"moving\n\r");
+                            #ifdef DEBUG_ON
+							    uart_print_string(USART1,"moving\n\r");
+                            #endif
+	                        led_off(LED2);
 
 							//Inactivity or Motion detection now
 							i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL,
@@ -272,10 +278,12 @@ void main(void)
 
 						if (reason & ADXL345_REG_INT_SOURCE_INACTIVITY) {
 							gps_power_on(); //Boo! resets board
-							uart_print_string(USART1,"stopped\n\r");
+                            #ifdef DEBUG_ON
+							    uart_print_string(USART1,"stopped\n\r");
+                            #endif
+                            led_on(LED2);
 							//gps_print_location();
 							gps_run_main_seq();
-							uart_print_string(USART1,"got data...");
 
 							//Format GPS for BLE transmission
 							char* p=gps_data;
@@ -313,6 +321,11 @@ void main(void)
                             *p='/0';
 
 							gps_power_off();
+
+                            #ifdef DEBUG_ON
+                                uart_print_string(USART1,gps_data);
+                                uart_print_string(USART1,"\n\r");
+                            #endif
 
 
 							//Motion detection only now

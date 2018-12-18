@@ -22,6 +22,7 @@
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_usart.h"
+#include "main.h"
 #include "leds.h"
 #include "accelerometer.h"
 #include "gps.h"
@@ -58,7 +59,7 @@ void initBoard(void)
   USART_Enable(USART0,usartEnable);
 #endif
 
-#if 1
+#ifdef DEBUG_ON
   UART1_init();
   USART_Enable(USART1,usartEnable);
 #endif

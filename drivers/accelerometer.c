@@ -126,7 +126,7 @@ i2c_write_register_1_byte(ADXL345_REG_BW_RATE,ADXL345_REG_BW_RATE_RATE_MASK & AD
 i2c_write_register_1_byte(ADXL345_REG_INT_ENABLE, 0);
 
 //Set motion threshold - try 1/20g 3 x 62.5 mg = .1875G
-i2c_write_register_1_byte(ADXL345_REG_THRESH_ACT, 20);
+i2c_write_register_1_byte(ADXL345_REG_THRESH_ACT, 15);
 i2c_write_register_1_byte(ADXL345_REG_THRESH_INACT, 20);
 //i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL, ADXL345_REG_ACT_X|ADXL345_REG_ACT_Y|ADXL345_REG_ACT_Z);
 //i2c_write_register_1_byte(ADXL345_REG_ACT_INACT_CTL, ADXL345_REG_INACT_X|ADXL345_REG_INACT_Y|ADXL345_REG_INACT_Z);
